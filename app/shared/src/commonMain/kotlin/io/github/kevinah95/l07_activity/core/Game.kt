@@ -60,30 +60,38 @@ class Game : GameSession {
         val d = dtMs / 1000.0
         val currentObjects = objects.toList()
 
-        // TODO Paso 3.1: Integrar posición según velocidad (x += vx * d, y += vy * d)
+        // Fase 1: Movimiento, gravedad y rebotes
         for (obj in currentObjects) {
-            // obj.x += obj.vx * d
-            // obj.y += obj.vy * d
+            // Integración de Euler: actualizar posición según velocidad
+            obj.x += obj.vx * d
+            obj.y += obj.vy * d
 
-            // TODO Paso 3.2: Aplicar aceleración de gravedad hacia abajo si tiene masa y está en el aire
-            // if (obj.mass > 0 && obj.y > 0) { obj.vy -= obj.mass * d }
+            // Aplicar gravedad a objetos con masa que estén en el aire
+            if (obj.mass > 0.0 && obj.y > 0.0) {
+                obj.vy -= obj.mass * d
+            }
 
-            // TODO Paso 3.3: Restricción contra el suelo y techo (rebote y fricción)
             val lower = stage.floor
             val upper = stage.ceiling - obj.spriteHeight
 
+            // Restricción vertical contra suelo o techo
             if (obj.y < lower || obj.y > upper) {
                 obj.y = clamp(obj.y, lower, upper)
+
                 if (abs(obj.vy) >= 10.0 || obj.despawnOnBounce) {
                     obj.onBounce()
                 }
+
+                // Invertir la velocidad vertical aplicando el rebote
                 obj.vy *= -obj.bounce
             }
 
+            // Aplicar fricción cuando el objeto está sobre un límite vertical
             if (obj.y == lower || obj.y == upper) {
                 obj.vx *= (1.0 - obj.friction)
             }
 
+            // Eliminar hechizos que salgan de los límites horizontales
             if (obj.x < 0.0 || obj.x > stage.width) {
                 if (obj.isTagged(Tags.SPELL)) {
                     despawn(obj)
@@ -91,10 +99,13 @@ class Game : GameSession {
             }
         }
 
-        // Fase 2: Colisiones entre objetos usando las cajas AABB y canCollideWith()
+        // Fase 2: Colisiones entre objetos mediante AABB y bitmasks
         for (obj in currentObjects) {
             for (target in currentObjects) {
-                if (obj.canCollideWith(target) && obj.bounds().overlaps(target.bounds())) {
+                if (
+                    obj.canCollideWith(target) &&
+                    obj.bounds().overlaps(target.bounds())
+                ) {
                     obj.onCollision(target)
                 }
             }
