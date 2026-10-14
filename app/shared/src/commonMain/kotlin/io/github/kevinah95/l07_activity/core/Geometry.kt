@@ -3,7 +3,10 @@ package io.github.kevinah95.l07_activity.core
 import kotlin.math.cos
 import kotlin.math.sin
 
-data class Point2D(val x: Double, val y: Double)
+data class Point2D(
+    val x: Double,
+    val y: Double
+)
 
 data class Rect2D(
     val x: Double,
@@ -12,28 +15,27 @@ data class Rect2D(
     val height: Double
 ) {
     /**
-     * Detección de colisión entre dos rectángulos alineados con los ejes (AABB).
+     * Determina si este rectángulo se superpone con [other]
+     * mediante detección AABB.
      *
-     * TODO Paso 2.1: Dos cajas colisionan si y solo si se solapan en ambos ejes X e Y:
-     * - this.x < other.x + other.width
-     * - this.x + this.width > other.x
-     * - this.y < other.y + other.height
-     * - this.y + this.height > other.y
+     * Los bordes que únicamente se tocan no se consideran una colisión.
      */
     fun overlaps(other: Rect2D): Boolean {
-        // TODO: Implementar la condición AABB
-        return false
+        return x < other.x + other.width &&
+                x + width > other.x &&
+                y < other.y + other.height &&
+                y + height > other.y
     }
 }
 
 /**
- * Convierte un ángulo en radianes a un vector de dirección 2D normalizado (cos, sin).
- *
- * TODO Paso 2.2: Retorna un Point2D con x = cos(radians) e y = sin(radians).
+ * Convierte un ángulo expresado en radianes en un vector unitario.
  */
 fun vectorFromAngle(radians: Double): Point2D {
-    // TODO: Retornar Point2D con cos(radians) y sin(radians)
-    return Point2D(0.0, 0.0)
+    return Point2D(
+        x = cos(radians),
+        y = sin(radians)
+    )
 }
 
 fun clamp(value: Double, min: Double, max: Double): Double =
