@@ -1,12 +1,15 @@
 package io.github.kevinah95.l07_activity.entities
 
-import io.github.kevinah95.l07_activity.core.*
+import io.github.kevinah95.l07_activity.core.Game
+import io.github.kevinah95.l07_activity.core.GameObject
+import io.github.kevinah95.l07_activity.core.Tags
 
 /**
  * Fábrica de entidades del juego.
- * Cada entidad es un [GameObject] configurado con sus tags, físicas y callbacks.
+ *
+ * Cada entidad es un GameObject configurado con sus etiquetas,
+ * propiedades físicas y callbacks.
  */
-
 fun createPlayer(): GameObject {
     return GameObject().apply {
         x = 20.0
@@ -22,30 +25,36 @@ fun createPlayer(): GameObject {
 }
 
 /**
- * TODO Paso 4.1: Crea el proyectil de hechizo con físicas y colisiones:
- * - spriteName = "spell_skull"
- * - spriteWidth = 24, spriteHeight = 24
- * - tags = Tags.SPELL
- * - collisionMask = Tags.LIVING
- * - mass = 100.0 (afectado por la gravedad)
- * - friction = 0.1
- * - despawnOnCollision = true
- * - despawnOnBounce = true
- * - onCollisionAction = al colisionar con [target], aplicar 1 punto de daño mediante gameSession.damage(target, 1, this)
+ * Crea el proyectil mágico utilizado por el jugador.
+ *
+ * El proyectil:
+ * - Está identificado como SPELL.
+ * - Solo colisiona con entidades LIVING.
+ * - Es afectado por la gravedad.
+ * - Desaparece al colisionar o rebotar.
+ * - Inflige un punto de daño al objetivo.
  */
 fun createSpell(): GameObject {
     return GameObject().apply {
         spriteName = "spell_skull"
         spriteWidth = 24
         spriteHeight = 24
-        tags = Tags.NONE // TODO Paso 4.1: Asigna Tags.SPELL
-        collisionMask = Tags.NONE // TODO Paso 4.1: Asigna Tags.LIVING
-        mass = 0.0 // TODO: Asigna 100.0
+
+        tags = Tags.SPELL
+        collisionMask = Tags.LIVING
+
+        mass = 100.0
         friction = 0.1
+
         despawnOnCollision = true
         despawnOnBounce = true
+
         onCollisionAction = { target ->
-            (gameSession as? Game)?.damage(target, 1, this)
+            (gameSession as? Game)?.damage(
+                target = target,
+                amount = 1,
+                dealer = this
+            )
         }
     }
 }
